@@ -1,0 +1,63 @@
+#include<iostream>
+#include <conio.h>
+#include <string>
+#include <map>
+#include<SFML/Network.hpp>
+#include<SFML/Network/Socket.hpp>
+#include<SFML/System.hpp>
+using namespace std;
+using namespace sf;
+UdpSocket socket;
+char p[5];
+//char p2[5];
+int t= 0;
+
+std::size_t received = NULL;
+sf::IpAddress sender;
+sf::IpAddress sender2 = sf::IpAddress("172.17.8.235"); // "169.230.4.4"
+unsigned short port;
+unsigned short port2 = 54000;
+Mutex mutex;
+bool a = true;
+void receive() {
+ mutex.lock();
+ if (socket.bind(54000) != sf::Socket::Done)
+ {
+ cerr « "not riceive" « endl;
+ }
+
+
+
+ while (a == true) {
+ if (socket.receive(p, 5, received, sender, port) != sf::Socket::Done)
+ {
+ cerr « "error receiving from player1" « endl;
+ }
+ else {
+ if (sender != "172.17.8.235") { // server ve kodash send nakonad
+ std::cout « "Received " « received « " bytes from " « sender « " on port " « port « std::endl;
+ std::cout « p[0] « p[1] « std::endl;
+ if (p[0] == NULL){ t++; cout « "TEDAD = " « t « endl; }
+
+
+ if (socket.send(p, 5, sender2, port2) != sf::Socket::Done){ std::cerr « "error in sending to player1"; }
+ else { cout « "Sent " « p[0] « " and " « p[1] « " and " « p[2] « " and " « p[3] « " and " « p[4] « std::endl; p[0] = 'v'; }
+ }
+ }
+ }
+ mutex.unlock();
+
+}
+
+
+
+int main(){
+
+ Thread receive(&receive);
+
+
+ receive.launch();
+
+ system("pause");
+ return 0;
+}
