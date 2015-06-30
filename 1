@@ -1,0 +1,177 @@
+#include <SFML/Graphics.hpp>
+#include <ctime>
+#include <cmath>
+#include <iostream>
+#include <SFML/Audio.hpp>
+
+using namespace std;
+
+int main()
+{
+ //make window
+ sf::RenderWindow window(sf::VideoMode(1200, 800), "Tank shot");
+
+ 
+ /*
+ sf::SoundBuffer buffer;
+ if (!buffer.loadFromFile("song0.mp3"))
+ return;
+
+ std::cout « "song0.mp3:" « std::endl;
+ std::cout « " " « buffer.getDuration().asSeconds() « " seconds" « std::endl;
+ std::cout « " " « buffer.getSampleRate() « " samples / sec" « std::endl;
+ std::cout « " " « buffer.getChannelCount() « " channels" « std::endl;
+
+ sf::Sound sound(buffer);
+ sound.play();
+ */
+
+ //make tank shape
+ sf::Texture tankT;
+ if (!tankT.loadFromFile("tank1.png"))
+ return EXIT_FAILURE;
+
+ sf::Sprite tankS;
+ tankS.setTexture(tankT);
+ tankS.setOrigin(216 / 2, 165 / 2);
+ tankS.setPosition(400,400);
+ tankS.rotate(180);
+
+
+
+ //make balls shape
+ sf::CircleShape ball[200];
+ int ballC = 0;
+ for (int i = 0; i < 200; i++){
+
+ ball[i].setRadius(6);
+ ball[i].setFillColor(sf::Color::Black);
+ ball[i].setOrigin(3,3);
+ ball[i].setPosition(-10, -10);
+ }
+
+
+
+
+ //make head shape
+ sf::Texture headT;
+ if (!headT.loadFromFile("head0.png"))
+ return EXIT_FAILURE;
+
+ sf::Sprite headS;
+ headS.setTexture(headT);
+ headS.setOrigin(54,121/2);
+ headS.setPosition(400, 400);
+
+
+
+
+ //set background
+ sf::Texture backT;
+ if (!backT.loadFromFile("back5.png"))
+ return EXIT_FAILURE;
+ //backT.setRepeated(true);
+
+ sf::Sprite backS;
+ backS.setTexture(backT);
+ backS.setOrigin(1801 / 2, 1102 / 2);
+ backS.setPosition(400, 400);
+
+
+
+ const float a = 3.14 / 180;
+ sf::Vector2f pos;
+ while (window.isOpen())
+ {
+
+ sf::Event event;
+ bool b = 0;
+
+ while (window.pollEvent(event))
+ {
+
+ if (event.type == sf::Event::Closed)
+ window.close();
+
+ pos = backS.getPosition();
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ){
+ backS.move(-10.f * cos(tankS.getRotation()*a), -10.f * sin(tankS.getRotation()*a)); 
+ cout « pos.x « " " « pos.y « endl;
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ){
+ backS.move(10.f * cos(tankS.getRotation()*a), 10.f * sin(tankS.getRotation()*a));
+ pos = backS.getPosition();
+ cout « pos.x « " " « pos.y « endl;
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
+ tankS.rotate(-3);
+ headS.rotate(-3);
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)){
+ tankS.rotate(3);
+ headS.rotate(3);
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+ headS.rotate(3);
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+ headS.rotate(-3);
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
+ pos = headS.getPosition();
+ ball[ballC].setPosition(pos.x + 150 * cos(headS.getRotation()*a), pos.y + 150 * sin(headS.getRotation()*a));
+ ball[ballC].rotate(headS.getRotation());
+ ballC++;
+ }
+
+ }
+
+ pos = backS.getPosition();
+
+ if (pos.x < -589.999)
+ backS.move(1, 0);
+ if (pos.x > 1193.37)
+ backS.move(-1, 0);
+ if (pos.y < -945.49)
+ backS.move(0, 1);
+ if (pos.y > 842.74)
+ backS.move(0, -1);
+
+ headS.move(-10.f * cos(headS.getRotation()*a), -10.f * sin(headS.getRotation()*a));
+ headS.move(10.f * cos(headS.getRotation()*a), 10.f * sin(headS.getRotation()*a));
+
+ for (int i = 0; i <= ballC; i++){
+ pos = ball[i].getPosition();
+ if (pos.x != -10){
+ ball[i].move(cos(ball[i].getRotation()*a),sin(ball[i].getRotation()*a));
+ }
+ }
+
+
+ if (ballC >= 180){
+ for (int i = 0; i < 200; i++){
+ ball[i].setPosition(-10, -10);
+ ball[i].setRotation(0);
+ }
+ ballC = 0;
+ }
+
+
+ window.clear();
+ //if (b==1)
+ // window.draw(shape);
+ window.draw(backS);
+ window.draw(tankS);
+ window.draw(headS);
+ for (int i = 0; i <= ballC; i++)
+ window.draw(ball[i]);
+ window.display();
+ }
+
+ return 0;
+}
