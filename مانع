@@ -1,0 +1,43 @@
+//(x,y)the center of tank
+//if push right button
+int rightmove(int x, int y){
+ x = +108;
+ if (x == 300){
+ if (y >= 167 & y <= 583)
+ retun 0;
+ else
+ return 1;
+ }
+}
+//if push left button
+int leftmove(int x, int y){
+ x = -108;
+ if (x == 488){
+ if (y >= 167 & y <= 583)
+ retun 0;
+ else
+ return 1;
+ }
+}
+//if push up button
+int upmove(int x, int y){
+ y = -83;
+ if (x == 500){
+ if (x >= 192 & x <= 596)
+ retun 0;
+ else
+ return 1;
+ }
+}
+//if push down button
+int downmove(int x, int y){
+ y = +83;
+ if (x == 250){
+ if (x >= 192 & x <= 596)
+ retun 0;
+ else
+ return 1;
+ }
+}
+
+//if retun 1:x++ if return 0:dont move
