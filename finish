@@ -1,0 +1,240 @@
+#include <SFML/Graphics.hpp>
+#include <ctime>
+#include <cmath>
+#include <iostream>
+#include <SFML/Audio.hpp>
+
+using namespace std;
+
+
+class Tank{
+
+public:
+
+ sf::Texture tankT;
+ sf::Sprite tankS;
+ sf::CircleShape ball[200];
+ int ballC;
+ sf::Texture headT;
+ sf::Sprite headS;
+ int lives;
+ int id;
+ static int n;
+
+ Tank(){
+ id = n;
+ n++;
+ tankT.loadFromFile("tank1.png");
+ tankT.setSmooth(true);
+ tankS.setTexture(tankT);
+ tankS.setOrigin(216 / 2, 165 / 2);
+ tankS.setPosition(800, 400);
+ tankS.rotate(180);
+
+ ballC = 0;
+ for (int i = 0; i < 200; i++){
+
+ ball[i].setRadius(6);
+ ball[i].setFillColor(sf::Color::Black);
+ ball[i].setOrigin(3, 3);
+ ball[i].setPosition(-10, -10);
+ }
+
+ headT.loadFromFile("head0.png");
+ headT.setSmooth(true);
+ headS.setTexture(headT);
+ headS.setOrigin(54, 121 / 2);
+ headS.setPosition(800, 400);
+
+
+ lives = 3;
+ }
+
+};
+
+
+int Tank::n = 0;
+
+int main()
+{
+ //make window
+ sf::RenderWindow window(sf::VideoMode(1200, 800), "Tank shot");
+
+
+ sf::SoundBuffer szB;
+ sf::Sound sz;
+ if (!szB.loadFromFile("orchestral.ogg"))
+ cout « "error not open file for sound";
+ sz.setBuffer(szB);
+
+ sz.play();
+
+
+ sf::SoundBuffer ssB;
+ sf::Sound ss;
+ if (!ssB.loadFromFile("shelik.ogg"))
+ cout « "error not open file for sound";
+ ss.setBuffer(ssB);
+
+
+ sf::SoundBuffer smB;
+ sf::Sound sm;
+ if (!smB.loadFromFile("move.ogg"))
+ cout « "error not open file for sound";
+ sm.setBuffer(smB);
+
+
+ Tank tank;
+
+ Tank t1, t2, t3;
+
+
+ //set background
+ sf::Texture backT;
+ if (!backT.loadFromFile("back7-2.png"))
+ return EXIT_FAILURE;
+ backT.setSmooth(true);
+ //backT.setRepeated(true);
+
+ sf::Sprite backS;
+ backS.setTexture(backT);
+ backS.setOrigin(200, 600);
+ backS.setPosition(0, 0);
+
+
+
+ //make map
+ sf::Texture mapT;
+ if (!mapT.loadFromFile("map0-4.jpg"))
+ return EXIT_FAILURE;
+ mapT.setSmooth(true);
+ sf::RectangleShape black(sf::Vector2f(400, 800));
+ black.setPosition(0, 0);
+ black.setTexture(&mapT);
+
+
+ //make map1
+ sf::Texture mapT1;
+ if (!mapT1.loadFromFile("map1.png"))
+ return EXIT_FAILURE;
+
+ sf::RectangleShape map(sf::Vector2f(250, 250));
+ map.setPosition(75, 475);
+ map.setTexture(&mapT1);
+
+ //make rec
+ sf::RectangleShape rec(sf::Vector2f(100, 100));
+ rec.setPosition(0, 0);
+ rec.setOrigin(-150, -550);
+ rec.setOutlineThickness(5);
+ rec.setOutlineColor(sf::Color::Black);
+ rec.setFillColor(sf::Color::Transparent);
+
+
+ const float a = 3.14 / 180;
+ sf::Vector2f pos;
+ while (window.isOpen())
+ {
+
+ sf::Event event;
+ bool b = 0;
+
+ while (window.pollEvent(event))
+ {
+
+ if (event.type == sf::Event::Closed)
+ window.close();
+
+ pos = backS.getPosition();
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
+ backS.move(-10.f * cos(tank.tankS.getRotation()*a), -10.f * sin(tank.tankS.getRotation()*a));
+ cout « pos.x « " " « pos.y « endl;
+ sm.play();
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){
+ backS.move(10.f * cos(tank.tankS.getRotation()*a), 10.f * sin(tank.tankS.getRotation()*a));
+ pos = backS.getPosition();
+ cout « pos.x « " " « pos.y « endl;
+ sm.play();
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
+ tank.tankS.rotate(-3);
+ tank.headS.rotate(-3);
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)){
+ tank.tankS.rotate(3);
+ tank.headS.rotate(3);
+ }
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+ tank.headS.rotate(3);
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+ tank.headS.rotate(-3);
+
+ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
+ pos = tank.headS.getPosition();
+ tank.ball[tank.ballC].setPosition(pos.x + 150 * cos((tank.headS.getRotation()-3)*a), pos.y + 150 * sin((tank.headS.getRotation()-3)*a));
+ tank.ball[tank.ballC].rotate(tank.headS.getRotation());
+ tank.ballC++;
+ ss.play();
+ }
+
+ }
+
+ pos = backS.getPosition();
+
+
+
+ if (pos.x < -900)
+ backS.move(1, 0);
+ if (pos.x > 900)
+ backS.move(-1, 0);
+ if (pos.y < -901)
+ backS.move(0, 1);
+ if (pos.y > 898)
+ backS.move(0, -1);
+
+Fateme karimkhani, [30.06.15 21:32]
+tank.headS.move(-10.f * cos(tank.headS.getRotation()*a), -10.f * sin(tank.headS.getRotation()*a));
+ tank.headS.move(10.f * cos(tank.headS.getRotation()*a), 10.f * sin(tank.headS.getRotation()*a));
+
+ rec.setPosition(pos.x / -8, pos.y / -8);
+
+ for (int i = 0; i <= tank.ballC; i++){
+ pos = tank.ball[i].getPosition();
+ if (pos.x != -10){
+ tank.ball[i].move(cos(tank.ball[i].getRotation()*a), sin(tank.ball[i].getRotation()*a));
+ }
+ }
+
+
+ if (tank.ballC >= 180){
+ for (int i = 0; i < 200; i++){
+ tank.ball[i].setPosition(-10, -10);
+ tank.ball[i].setRotation(0);
+ }
+ tank.ballC = 0;
+ }
+
+
+ window.clear();
+ //if (b==1)
+ // window.draw(shape);
+ window.draw(backS);
+ window.draw(tank.tankS);
+ window.draw(tank.headS);
+ for (int i = 0; i <= tank.ballC; i++)
+ window.draw(tank.ball[i]);
+ window.draw(black);
+ window.draw(map);
+ window.draw(rec);
+ window.display();
+ }
+
+ return 0;
+}
